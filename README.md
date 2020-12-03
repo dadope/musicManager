@@ -1,14 +1,14 @@
-#musicManager
-#####A python3 command-line music player,  
-#####automatically adds all directories (with mp3 files) in your Music directory _($home/Music)_ as playlists
+# musicManager  
+##### A python3 command-line music player,  
+##### automatically adds all directories (with mp3 files) in your Music directory _($home/Music)_ as playlists
 
-##Installation
+## Installation
 ```shell script
 git clone https://github.com/dadope/musicManager  # clone (download) the repository
 cd musicManager                                   # enter the project directory
 make install                                      # installation, alternatively use pip(3) install .
 ```
-##Usage
+## Usage
 ```
 usage: musicManager [-h] [-p PLAYLIST] [-a ARTIST] [-n] [-c] [-r]
 
