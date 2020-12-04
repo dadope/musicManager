@@ -9,7 +9,7 @@ def index_music(MUSIC_DIR:str, PLAYLISTS_DIR:str):
     :return: the last created playlist
     """
 
-    last_playlist = ""
+    playlists = []
     number_of_playlists = 0
 
     print("Indexing music...\n\n")
@@ -21,10 +21,9 @@ def index_music(MUSIC_DIR:str, PLAYLISTS_DIR:str):
         if len(glob.glob(path.join(folder, "*.mp3"))) != 0:
             # removes the trailing / and gets the folder name
             playlist_name = path.basename(path.normpath(folder))
+            playlists.append(playlist_name)
 
             number_of_playlists =+ 1
-            last_playlist = playlist_name
-
             print(f"found music in '{folder}', adding as playlist\n")
 
             playlist_json = {
@@ -38,5 +37,5 @@ def index_music(MUSIC_DIR:str, PLAYLISTS_DIR:str):
     if number_of_playlists == 0:
         print("WARNING!\ncould not find any playlists in your music folder that contain an mp3 file, please manually add your playlists and then run the program again")
         exit(1)
-    else:
-        return last_playlist
+
+    return playlists

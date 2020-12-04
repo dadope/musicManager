@@ -30,23 +30,22 @@ if not path.exists(PROJECT_DATA_DIR):
     move(path.join(_current_project_dir, "data"), PROJECT_DATA_DIR)
     move(path.join(_current_project_dir, "res"), PROJECT_DATA_DIR)
 
-
-    #TODO: make the user select the default playlist
-
     from .tools import indexer
+    playlists = indexer.index_music(MUSIC_DIR, PLAYLISTS_DIR)
 
-    _default_playlist = indexer.index_music(MUSIC_DIR, PLAYLISTS_DIR)
-
-    #TODO: make user setup his media keys
+    # makes the user select the default playlist
+    from .tools import cli
+    _default_playlist = cli.setup_default_playlist(playlists)
 
     _default_settings = {
-      "default_playlist": _default_playlist,
-      "default_playback_order": "random",
-
-      "next_media_key": "<269025047>",
-      "prev_media_key": "<269025046>",
-      "stop_media_key": "<269025045>",
-      "pause_media_key": "<269025044>"
+        "default_playlist": _default_playlist,
+        "default_playback_order": "random",
+        "media_keys":{
+            "next_media_key": "<269025047>",
+            "prev_media_key": "<269025046>",
+            "stop_media_key": "<269025045>",
+            "pause_media_key": "<269025044>"
+        }
     }
 
     with open(path.join(USER_DATA_DIR, "settings.json"), "w") as file:
@@ -56,10 +55,10 @@ if not path.exists(PROJECT_DATA_DIR):
 SETTINGS = json.load(open(path.join(USER_DATA_DIR, "settings.json"), "r"))
 
 # reading default media key values from the settings
-NEXT_MEDIA_KEY = SETTINGS["next_media_key"]
-PREV_MEDIA_KEY = SETTINGS["prev_media_key"]
-STOP_MEDIA_KEY = SETTINGS["stop_media_key"]
-PAUSE_MEDIA_KEY = SETTINGS["pause_media_key"]
+NEXT_MEDIA_KEY = SETTINGS["media_keys"]["next_media_key"]
+PREV_MEDIA_KEY = SETTINGS["media_keys"]["prev_media_key"]
+STOP_MEDIA_KEY = SETTINGS["media_keys"]["stop_media_key"]
+PAUSE_MEDIA_KEY = SETTINGS["media_keys"]["pause_media_key"]
 
 # setting up the logger (log file: .../home/.musicManager/data/logs.log)
 logger = logging
