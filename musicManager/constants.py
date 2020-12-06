@@ -25,7 +25,8 @@ if not path.exists(PROJECT_DATA_DIR):
     # directory in which the project is currently located
     _current_project_dir = path.dirname(path.realpath(__file__))
 
-    remove(path.join(_current_project_dir, "res", "playlists", "deleteme"))
+    # deletes placeholder file
+    remove(path.join(_current_project_dir, "res", "playlists", "example"))
 
     move(path.join(_current_project_dir, "data"), PROJECT_DATA_DIR)
     move(path.join(_current_project_dir, "res"), PROJECT_DATA_DIR)
@@ -63,3 +64,8 @@ PAUSE_MEDIA_KEY = SETTINGS["media_keys"]["pause_media_key"]
 # setting up the logger (log file: .../home/.musicManager/data/logs.log)
 logger = logging
 logger.basicConfig(filename=path.join(USER_DATA_DIR, "logs.log"), level=logging.INFO, format="%(asctime)s => %(name)s:%(process)d :: (%(levelname)s) %(message)s")
+
+logger.info("Initializing program")
+
+from .tools.data_collector import data_collector
+collector = data_collector(logger, USER_DATA_DIR)

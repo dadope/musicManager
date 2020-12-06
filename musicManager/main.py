@@ -1,9 +1,11 @@
+#TODO: add listening data collection: time listened, tracks skipped...
+
 import argparse
 
-from .constants import SETTINGS, logger
+from .constants import SETTINGS, collector
 from .tools import listener, other, handler
 
-parser = argparse.ArgumentParser(description="plays music", prog="musicManager")
+parser = argparse.ArgumentParser(description="Music player written in python", prog="musicManager")
 
 parser.add_argument("-p", "--playlist",  action="store",     type=str, help="Specify the playlist to play")
 parser.add_argument("-a", "--artist",    action="store",     type=str, help="Specify the artist to play")
@@ -13,8 +15,6 @@ parser.add_argument("-r", "--random",    action="store_true",          help="pla
 
 args = parser.parse_args()
 playlists = other.getPlaylists()
-
-logger.info("Starting program")
 
 def main():
     try:
@@ -27,8 +27,7 @@ def main():
     except KeyboardInterrupt:
         if args.cli:
             print("\nExiting program")
-        logger.fatal("Keyboard interrupt key pressed, exiting")
-        exit(0)
+        collector.log_critical_and_exit("Keyboard interrupt pressed, exiting")
 
 
 def play(inputPlaylist):
@@ -40,8 +39,7 @@ def play(inputPlaylist):
 
     if not playlist_to_play:
         print("Error - could not find that playlist, exiting")
-        logger.fatal(f"could not find playlist '{inputPlaylist}', exiting")
-        exit(1)
+        collector.log_critical_and_exit(f"could not find playlist '{inputPlaylist}', exiting", 1)
 
     # getting a list of all songs in playlist_to_play
     songs = other.getSongs(playlist_to_play)

@@ -5,7 +5,7 @@ from random import shuffle
 from urllib.parse import unquote_plus, urlparse
 from vlc import Instance, EventType, PlaybackMode
 
-from ..constants import logger
+from ..constants import collector
 
 # playlist sort
 RANDOM_ORDER = "random"
@@ -34,8 +34,7 @@ class mediaHandler:
 
             if len(self.songs) < 1:
                 print("Artist could not be found in the playlist, exiting")
-                logger.fatal(f"Could not find artist {self.artist}")
-                exit(1)
+                collector.log_critical_and_exit(f"Could not find artist {self.artist}", 1)
 
         if orderToPlay == RANDOM_ORDER:
             if self.cli: print("Randomly sorting the playlist...")
@@ -48,8 +47,7 @@ class mediaHandler:
         # confirming that there are songs to be played
         if len(songs) == 0:
             print("There are no songs to be played, exiting")
-            logger.fatal(f"no songs to be played")
-            exit(1)
+            collector.log_critical_and_exit("no songs to be played", 1)
 
         self.currFile = self.songs[0]
         self.currFilename = path.basename(self.currFile)
