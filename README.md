@@ -24,3 +24,11 @@ optional arguments:
   -c, --cli             display cli information
   -r, --random          play randomly
 ```
+## Features
++ commandline-interface
++ automatic playlist creation 
++ listening time collection (in total and per song)
++ different playback modes
+#### Todos:
++ settings menu
++ playback mode that adapts to the listening time on each song
