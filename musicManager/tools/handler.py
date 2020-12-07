@@ -12,7 +12,7 @@ RANDOM_ORDER = "random"
 ALPHABETIC_ORDER = "alphabet"
 
 class mediaHandler:
-    def __init__(self, songs:list, orderToPlay:str=None, artist:str=None, cli:bool=True):
+    def __init__(self, songs:list, playlist:dict, orderToPlay:str=None, artist:str=None, cli:bool=True):
         """
         handles everything related to playing the music
 
@@ -25,6 +25,7 @@ class mediaHandler:
         self.songs = songs
         self.artist = artist
         self.orderToPlay = orderToPlay
+        self.playlist_name = playlist["playlist"]
         self.vlc_instance = Instance()
 
         self.playing = False
@@ -65,12 +66,13 @@ class mediaHandler:
 
         # function gets called on every playback event
         #
-        # if commandline mode enabled:
-        # gets the base filename of the audio file currently playing, then prints information out about the file
+        # gets the base filename of the audio file currently playing
+        # if commandline-mode enabled: then prints information out about the file
         def listPlayerCallback(event):
+            self.currFile = self.getFilename(self.playlistPlayer.get_media_player().get_media().get_mrl())
+            self.currFilename = path.basename(self.currFile)
+
             if self.cli:
-                self.currFile = self.getFilename(self.playlistPlayer.get_media_player().get_media().get_mrl())
-                self.currFilename = path.basename(self.currFile)
                 self.printFileInfo(self.getFileInfo(self.currFile), self.currFile)
 
         self.list_player_events = self.playlistPlayer.event_manager()
@@ -103,17 +105,29 @@ playing {file}:
 
     def play_pause(self):
         if self.playing:
+            collector.stop_playlist_timer()
+            collector.stop_song_timer()
             self.playlistPlayer.pause()
         else:
+            collector.start_playlist_timer(self.playlist_name)
+            collector.start_song_timer(self.currFile)
             self.playlistPlayer.play()
 
         self.playing = not self.playing
 
     def next(self):
+        # usable because if no song is playing the function just returns without any effects
+        collector.stop_song_timer()
+
         self.playlistPlayer.next()
+        collector.start_song_timer(self.currFile)
 
     def previous(self):
+        # usable because if no song is playing the function just returns without any effects
+        collector.stop_song_timer()
+
         self.playlistPlayer.previous()
+        collector.start_song_timer(self.currFile)
 
     def getFilename(self, uri):
         return unquote_plus(urlparse(uri).path)

@@ -15,7 +15,7 @@ def getPlaylists() -> list:
     }
     """
 
-    return  [json.load(open(x, "r")) for x in glob(path.join(PLAYLISTS_DIR, "*.json"))]
+    return [json.load(open(x, "r")) for x in glob(path.join(PLAYLISTS_DIR, "*.json"))]
 
 def getSongs(playlists:dict) -> list:
     """

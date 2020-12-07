@@ -46,13 +46,13 @@ def play(inputPlaylist):
 
     # choosing the order in which the elements are played
     if args.random:
-        input_listener = listener.listener(handler.mediaHandler(songs, handler.RANDOM_ORDER, args.artist, args.cli))
+        input_listener = listener.listener(handler.mediaHandler(songs, playlist_to_play, handler.RANDOM_ORDER, args.artist, args.cli))
     elif args.alphabet:
-        input_listener = listener.listener(handler.mediaHandler(songs, handler.ALPHABETIC_ORDER, args.artist, args.cli))
+        input_listener = listener.listener(handler.mediaHandler(songs, playlist_to_play, handler.ALPHABETIC_ORDER, args.artist, args.cli))
     else:
         if args.cli:
             print(f"No playback option was selected, falling back to the default... ({SETTINGS['default_playback_order']})")
-        input_listener = listener.listener(handler.mediaHandler(songs, SETTINGS["default_playback_order"], args.artist, args.cli))
+        input_listener = listener.listener(handler.mediaHandler(songs, playlist_to_play, SETTINGS["default_playback_order"], args.artist, args.cli))
 
     # starting the music
     input_listener.handler.play_pause()
