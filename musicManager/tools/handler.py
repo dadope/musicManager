@@ -1,3 +1,5 @@
+from time import sleep
+
 import eyed3
 
 from os import path
@@ -5,6 +7,7 @@ from random import shuffle
 from urllib.parse import unquote_plus, urlparse
 from vlc import Instance, EventType, PlaybackMode
 
+from ..tools import cli
 from ..constants import collector
 
 # playlist sort
@@ -29,6 +32,17 @@ class mediaHandler:
         self.vlc_instance = Instance()
 
         self.playing = False
+        self.curr_media_player = None
+
+        # length of the song
+        self.curr_song_max_seconds = 0
+
+        # seconds that the song has been playing
+        self.curr_song_playing_seconds = 0
+
+        # percentage of the song already played
+        self.curr_song_percentage = 0
+
 
         if self.artist:
             self.songs = [x for x in self.songs if self.getFileInfo(x)["artist"].lower() == self.artist.lower()]
@@ -78,6 +92,36 @@ class mediaHandler:
         self.list_player_events = self.playlistPlayer.event_manager()
         self.list_player_events.event_attach(EventType.MediaListPlayerNextItemSet, listPlayerCallback)
 
+    # callback for MediaPlayerTimeChanged, gets the percentage, and time played of the current song and calls printProgressBar
+    def _media_player_callback(self, event):
+
+        # for unknown reasons self.curr_media_player.get_length() returns -1 in _set_event_callback_for_current_file
+        if self.curr_song_max_seconds == -1:
+            self.curr_song_max_seconds = self.curr_media_player.get_length()/1000
+
+        #self.curr_song_percentage = self.curr_media_player.get_position()
+
+        _current_percentage = self.curr_media_player.get_position()*100
+        self.curr_song_percentage = float('{:.2f}'.format(round(_current_percentage, 2)))
+        self.curr_song_playing_seconds = self.curr_media_player.get_time()/1000
+
+        cli.printProgressBar(self.curr_song_percentage, prefix=cli.format_time(self.curr_song_max_seconds, self.curr_song_playing_seconds))
+
+    # gets called when
+    def _set_event_callback_for_current_file(self):
+        self.curr_media_player = self.playlistPlayer.get_media_player()
+        self.curr_media_player_events = self.curr_media_player.event_manager()
+        self.curr_media_player_events.event_attach(EventType.MediaPlayerTimeChanged, self._media_player_callback)
+
+        self.curr_song_max_seconds = self.curr_media_player.get_length()
+
+    # cleanup before going to the next song
+    def _remove_event_callback_for_current_file(self):
+        self.curr_media_player_events.event_detach(EventType.MediaPlayerTimeChanged)
+        self.curr_media_player_events = None
+        self.curr_media_player = None
+
+
     # finds out information about the given file through metadata
     def getFileInfo(self, file:str) -> dict:
         audiofile = eyed3.load(file)
@@ -96,19 +140,22 @@ class mediaHandler:
 
     # prints out information about a file (used in conjunction with getFileInfo)
     def printFileInfo(self, fileInfo, file):
-        print(f'''
-playing {file}:
+        print(f'''\n\nplaying {file}:
     artist:  {fileInfo["artist"]}
     title:   {fileInfo["title"]}
     album:   {fileInfo["album"]}
-    genre:   {fileInfo["genre"]}''')
+    genre:   {fileInfo["genre"]}\n''')
 
     def play_pause(self):
         if self.playing:
+            self._remove_event_callback_for_current_file()
+
             collector.stop_playlist_timer()
             collector.stop_song_timer()
             self.playlistPlayer.pause()
         else:
+            self._set_event_callback_for_current_file()
+
             collector.start_playlist_timer(self.playlist_name)
             collector.start_song_timer(self.currFile)
             self.playlistPlayer.play()
