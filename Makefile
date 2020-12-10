@@ -1,4 +1,3 @@
-#just to have a makefile
 install:
 	pip3 install -r requirements.txt
 	pip3 install .
@@ -6,4 +5,11 @@ install:
 run:
 	pip3 install -r requirements.txt
 	pip3 install .
+	musicManager -c
+
+test:
+	pip3 install -r requirements.txt
+	pip3 install .
+
+	rm -rf ~/.musicManager/
 	musicManager -c

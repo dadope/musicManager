@@ -9,6 +9,7 @@ parser = argparse.ArgumentParser(description="Music player written in python", p
 
 parser.add_argument("-p", "--playlist",  action="store",     type=str, help="Specify the playlist to play")
 parser.add_argument("-a", "--artist",    action="store",     type=str, help="Specify the artist to play")
+parser.add_argument("-i", "--infinite",  action="store_true",          help="play in an infinite loop")
 parser.add_argument("-n", "--alphabet",  action="store_true",          help="play in alphabetic order")
 parser.add_argument("-c", "--cli",       action="store_true",          help="display cli information")
 parser.add_argument("-r", "--random",    action="store_true",          help="play randomly")
@@ -27,7 +28,7 @@ def main():
     except KeyboardInterrupt:
         if args.cli:
             print("\nExiting program")
-        collector.log_critical_and_exit("Keyboard interrupt pressed, exiting")
+        collector.log_and_exit("Keyboard interrupt pressed, exiting")
 
 
 def play(inputPlaylist):
@@ -39,20 +40,20 @@ def play(inputPlaylist):
 
     if not playlist_to_play:
         print("Error - could not find that playlist, exiting")
-        collector.log_critical_and_exit(f"could not find playlist '{inputPlaylist}', exiting", 1)
+        collector.log_and_exit(f"could not find playlist '{inputPlaylist}', exiting", 1)
 
     # getting a list of all songs in playlist_to_play
     songs = other.getSongs(playlist_to_play)
 
     # choosing the order in which the elements are played
     if args.random:
-        input_listener = listener.listener(handler.mediaHandler(songs, playlist_to_play, handler.RANDOM_ORDER, args.artist, args.cli))
+        input_listener = listener.listener(handler.mediaHandler(songs, playlist_to_play, handler.RANDOM_ORDER, args.artist, args.cli, args.infinite))
     elif args.alphabet:
-        input_listener = listener.listener(handler.mediaHandler(songs, playlist_to_play, handler.ALPHABETIC_ORDER, args.artist, args.cli))
+        input_listener = listener.listener(handler.mediaHandler(songs, playlist_to_play, handler.ALPHABETIC_ORDER, args.artist, args.cli, args.infinite))
     else:
         if args.cli:
             print(f"No playback option was selected, falling back to the default... ({SETTINGS['default_playback_order']})")
-        input_listener = listener.listener(handler.mediaHandler(songs, playlist_to_play, SETTINGS["default_playback_order"], args.artist, args.cli))
+        input_listener = listener.listener(handler.mediaHandler(songs, playlist_to_play, SETTINGS["default_playback_order"], args.artist, args.cli, args.infinite))
 
     # starting the music
     input_listener.handler.play_pause()

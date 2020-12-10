@@ -30,7 +30,7 @@ class listener:
             self.handler.previous()
         if str(key) == STOP_MEDIA_KEY:
             print("Stop media key pressed, exiting")
-            collector.log_critical_and_exit("Stop media key pressed, exiting")
+            collector.log_and_exit("Stop media key pressed, exiting")
 
     def startListening(self):
         """
